@@ -10,9 +10,9 @@ const {
     DB_PASS,
     DB_NAME,
     PORT
-} = process.env; // Destructure environment variables
+} = process.env; 
 
-// Ensure all required environment variables are defined
+
 assert(PORT, "PORT is required");
 assert(DB_SERVER, "DB_SERVER is required");
 assert(DB_USER, "DB_USER is required");
@@ -26,19 +26,18 @@ export const config = {
         password: DB_PASS,
         database: DB_NAME,
         server: DB_SERVER,
-        pool: { //pool is used to manage multiple connections to the database
+        pool: { 
             max: 10,
             min: 0,
             idleTimeoutMillis: 30000
         },
         options: {
-            encrypt: true, // for azure
-            trustServerCertificate: true // Change to true for local dev / self-signed certs
+            encrypt: true, 
+            trustServerCertificate: true 
         }
     }
 };
 
-// Create a connection pool - a cache of database connections maintained so that the connections can be reused when future requests to the database are required.
 export const getDbPool = async () => {
     try {
         const pool = await sql.connect(config.sqlConfig);

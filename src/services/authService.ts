@@ -1,10 +1,9 @@
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as userRepo from '../repositories/userRepository';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'nitafanyaverytutam_tokenyaujipower';
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_token';
 
-// Small helper functions
 export async function hashPassword(password: string) {
   return await bcrypt.hash(password, 10);
 }
@@ -17,19 +16,15 @@ export function createToken(userId: number, role: string) {
   return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: '7d' });
 }
 
-// Register new user
 export async function register(user: userRepo.UserCreate) {
   const existing = await userRepo.getUserByEmail(user.email);
   if (existing) throw new Error('Email already in use');
 
-  if (user.password_hash) {
-    user.password_hash = await hashPassword(user.password_hash);
-  }
+  user.password_hash = await hashPassword(user.password_hash);
 
   await userRepo.createUser(user);
 }
 
-// Login user
 export async function login(email: string, password: string) {
   const user = await userRepo.getUserByEmail(email);
   if (!user) throw new Error('Invalid credentials');

@@ -4,11 +4,11 @@ import app from '../app';
 import * as categoryRepo from '../repositories/categoryRepository';
 import { getDbPool } from '../utils/db';
 
-// ✅ Mock repository and DB pool
+// Mock repository and DB pool
 jest.mock('../repositories/categoryRepository');
 jest.mock('../utils/db');
 
-// ✅ Mock auth middleware to bypass authentication
+// Mock auth middleware to bypass authentication
 jest.mock('../middleware/authMiddleware', () => ({
   requireAuth: (req: any, res: any, next: any) => {
     req.user = { userId: 1 }; // mock logged-in user
@@ -26,7 +26,7 @@ describe('Category Service Integration Tests', () => {
     (getDbPool as jest.Mock).mockResolvedValue(fakePool);
   });
 
-  // ✅ Create Category
+  // Create Category
   it('should create a category successfully', async () => {
     (categoryRepo.createCategory as jest.Mock).mockResolvedValue(testCategory);
 
@@ -39,7 +39,7 @@ describe('Category Service Integration Tests', () => {
     expect(categoryRepo.createCategory).toHaveBeenCalledWith(fakePool, 'Food', 1);
   });
 
-  // ✅ Get Categories
+  // Get Categories
   it('should get categories successfully', async () => {
     (categoryRepo.getCategories as jest.Mock).mockResolvedValue([testCategory]);
 
@@ -50,7 +50,7 @@ describe('Category Service Integration Tests', () => {
     expect(categoryRepo.getCategories).toHaveBeenCalledWith(fakePool, 1);
   });
 
-  // ✅ Update Category
+  // Update Category
   it('should update category successfully', async () => {
     const updatedCategory = { ...testCategory, name: 'Groceries' };
     (categoryRepo.updateCategory as jest.Mock).mockResolvedValue(updatedCategory);
@@ -64,7 +64,7 @@ describe('Category Service Integration Tests', () => {
     expect(categoryRepo.updateCategory).toHaveBeenCalledWith(fakePool, 1, 'Groceries');
   });
 
-  // ✅ Delete Category
+  // Delete Category
   it('should delete category successfully', async () => {
     (categoryRepo.deleteCategory as jest.Mock).mockResolvedValue({ deleted: true });
 

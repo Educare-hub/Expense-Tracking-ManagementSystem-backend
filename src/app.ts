@@ -14,7 +14,7 @@ app.use('/api', routes);
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
-// connect to DB when app starts
+
 if (process.env.NODE_ENV !== 'test') {
   getDbPool()
     .then(() => console.log('Database connected successfully'))

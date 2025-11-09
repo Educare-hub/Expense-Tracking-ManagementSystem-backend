@@ -3,28 +3,28 @@ import * as authService from '../services/authService';
 import * as userRepo from '../repositories/userRepository';
 
 export async function register(req: Request, res: Response) {
+  console.log('Incoming register data:', req.body); // For debugging
   try {
-<<<<<<< HEAD
+    const { first_name, last_name, email, phone_number, password } = req.body;
 
-   const newUser = req.body;
-   console.log(newUser)
-    const user = await authService.register(newUser);
-    res.status(201).json({ message: 'User registered', user });
-  } catch (err:any) {
-=======
-    const newUser = req.body;
+    if (!first_name || !last_name || !email || !password) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
 
-    // Register the user (authService.register returns void)
+    const newUser = {
+      username: `${first_name} ${last_name}`,
+      email,
+      password_hash: password,
+    };
+
     await authService.register(newUser);
 
-    // Fetch the newly created user from the database to get all fields
-    const createdUser = await userRepo.getUserByEmail(newUser.email);
+    const createdUser = await userRepo.getUserByEmail(email);
 
     if (!createdUser) {
       return res.status(500).json({ error: 'User registration failed' });
     }
 
-    // Respond with user details
     res.status(201).json({
       message: 'User registered successfully',
       user: {
@@ -36,17 +36,22 @@ export async function register(req: Request, res: Response) {
       },
     });
   } catch (err: any) {
->>>>>>> 2483db4 (Add .gitattributes to standardize line endings)
+    console.error('Register error:', err.message);
     res.status(400).json({ error: err.message });
   }
 }
 
 export async function login(req: Request, res: Response) {
+  console.log('Incoming login data:', req.body);
   try {
     const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
     const result = await authService.login(email, password);
     res.json(result);
   } catch (err: any) {
+    console.error('Login error:', err.message);
     res.status(400).json({ error: err.message });
   }
 }
