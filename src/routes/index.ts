@@ -6,17 +6,14 @@ import { requireAuth } from '../middleware/authMiddleware';
 
 const router = Router();
 
-// Auth
 router.post('/auth/register', authCtrl.register);
 router.post('/auth/login', authCtrl.login);
 
-// Categories (protected)
 router.get('/categories', requireAuth, catCtrl.listCategories);
 router.post('/categories', requireAuth, catCtrl.createCategory);
 router.put('/categories/:id', requireAuth, catCtrl.updateCategory);
 router.delete('/categories/:id', requireAuth, catCtrl.deleteCategory);
 
-// Expenses (protected)
 router.post('/expenses', requireAuth, expCtrl.createExpense);
 router.get('/expenses', requireAuth, expCtrl.listExpenses);
 router.get('/expenses/:id', requireAuth, expCtrl.getExpense);
