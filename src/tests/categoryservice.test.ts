@@ -1,4 +1,3 @@
-// src/tests/categoryService.test.ts
 import * as categoryService from '../../src/services/categoryService';
 import * as catRepo from '../../src/repositories/categoryRepository';
 import { getDbPool } from '../../src/utils/db';

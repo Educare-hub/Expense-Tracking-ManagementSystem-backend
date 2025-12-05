@@ -1,4 +1,3 @@
-// src/tests/categoryserviceintegration.test.ts
 import request from 'supertest';
 import app from '../app';
 import * as categoryRepo from '../repositories/categoryRepository';

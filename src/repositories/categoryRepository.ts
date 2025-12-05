@@ -1,4 +1,3 @@
-// src/repositories/categoryRepository.ts
 import sql from 'mssql';
 
 export async function createCategory(pool: sql.ConnectionPool, name: string, userId?: number) {

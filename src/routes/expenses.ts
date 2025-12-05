@@ -1,20 +1,13 @@
-// backend/src/routes/expenses.ts
-import express, { Request, Response } from 'express';
+import express from "express";
+import auth from "../middleware/authMiddleware";
+import * as controller from "../controllers/expenseController";
 
-export const router = express.Router(); // ✅ named export for TypeScript
+const router = express.Router();
 
-// Example GET endpoint
-router.get('/', async (req: Request, res: Response) => {
-  try {
-    const pool = (req as any).db;
-    const result = await pool.request().query(`
-      SELECT TOP 10 id, amount, vendor, description, incurred_at 
-      FROM dbo.expenses 
-      ORDER BY created_at DESC
-    `);
-    res.json({ success: true, data: result.recordset });
-  } catch (err: any) {
-    console.error('❌ Query failed:', err.message);
-    res.status(500).json({ success: false, message: 'Query failed', error: err.message });
-  }
-});
+router.post("/", auth.authMiddleware, controller.createExpense);
+router.get("/", auth.authMiddleware, controller.listExpenses);
+router.get("/:id", auth.authMiddleware, controller.getExpense);
+router.put("/:id", auth.authMiddleware, controller.updateExpense);
+router.delete("/:id", auth.authMiddleware, controller.deleteExpense);
+
+export default router;

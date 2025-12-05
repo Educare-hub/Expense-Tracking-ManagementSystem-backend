@@ -1,3 +1,4 @@
+// src/services/authService.ts
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import * as userRepo from '../repositories/userRepository';
@@ -21,7 +22,6 @@ export async function register(user: userRepo.UserCreate) {
   if (existing) throw new Error('Email already in use');
 
   user.password_hash = await hashPassword(user.password_hash);
-
   await userRepo.createUser(user);
 }
 
@@ -33,6 +33,16 @@ export async function login(email: string, password: string) {
   if (!ok) throw new Error('Invalid credentials');
 
   const token = createToken(user.id, user.role);
-
   return { token, user: { id: user.id, username: user.username, email: user.email, role: user.role } };
+}
+
+export function generateVerificationCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// NEW: UPDATE PASSWORD — THIS FIXES YOUR ERROR
+export async function updatePassword(userId: number, newPassword: string) {
+  const hashedPassword = await hashPassword(newPassword);
+  await userRepo.updateUserPassword(userId, hashedPassword);
+  await userRepo.clearVerificationCode(userId); // optional but clean
 }

@@ -1,3 +1,6 @@
+//src/middleware/authMiddleware.ts
+
+
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
@@ -27,3 +30,6 @@ export function requireAdmin(req: AuthRequest, res: Response, next: NextFunction
   if (req.user.role !== 'Admin') return res.status(403).json({ error: 'Forbidden' });
   next();
 }
+
+
+export default { authMiddleware: requireAuth, adminMiddleware: requireAdmin };

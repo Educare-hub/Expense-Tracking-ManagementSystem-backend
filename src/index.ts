@@ -1,21 +1,13 @@
-import express from 'express';
-import cors from 'cors';
-import routes from './routes';
+// src/index.ts  ← THIS IS THE FILE THAT ACTUALLY RUNS
+import app from './app';
 import dotenv from 'dotenv';
-import { getDbPool } from './utils/db';
+
 dotenv.config();
 
-const app = express();
-app.use(cors());
-app.use(express.json()); 
-app.use('/api', routes);
+const PORT = process.env.PORT || 8081;
 
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
-
-const port = process.env.PORT || 8081;
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Admin endpoints: http://localhost:${PORT}/admin/users`);
+  console.log(`Admin endpoints: http://localhost:${PORT}/admin/expenses`);
 });
-
-getDbPool().then(() => console.log('Database connected successfully'))
-.catch((err) => console.error('Database connection failed:', err));

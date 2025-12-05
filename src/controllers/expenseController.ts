@@ -1,3 +1,5 @@
+//src/controllers/expenseController.ts
+
 import { Request, Response } from 'express';
 import * as expService from '../services/expenseService';
 import { AuthRequest } from '../middleware/authMiddleware';
