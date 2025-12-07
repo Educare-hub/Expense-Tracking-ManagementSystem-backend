@@ -1,4 +1,4 @@
-// src/app.ts  ←  FINAL VERSION — NEVER CHANGE AGAIN
+// src/app.ts  
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
@@ -18,11 +18,11 @@ app.use(cors({
 }));
 app.use(bodyParser.json({ limit: '5mb' }));
 
-// USER API — used by normal users (UserDashboard) → /api/expenses, /api/auth, etc.
+// USER API used by normal users (UserDashboard) /api/expenses, /api/auth
 app.use('/api', routes);
 
-// ADMIN API — used by AdminDashboard → /admin/users, /admin/expenses
-app.use('/admin', adminRoutes);   // ← THIS IS CORRECT AND MUST STAY
+// ADMIN API used by AdminDashboard /admin/users, /admin/expenses
+app.use('/admin', adminRoutes);   
 
 app.get('/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
 

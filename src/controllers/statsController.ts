@@ -15,7 +15,7 @@ export async function statsExpenses(req: AuthRequest, res: Response) {
       data: stats
     });
   } catch (err: any) {
-    console.error("❌ Stats Error:", err.message);
+    console.error("Stats Error:", err.message);
     res.status(500).json({ success: false, message: err.message });
   }
 }

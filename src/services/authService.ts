@@ -40,9 +40,9 @@ export function generateVerificationCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// NEW: UPDATE PASSWORD — THIS FIXES YOUR ERROR
+// NEW UPDATE PASSWORD 
 export async function updatePassword(userId: number, newPassword: string) {
   const hashedPassword = await hashPassword(newPassword);
   await userRepo.updateUserPassword(userId, hashedPassword);
-  await userRepo.clearVerificationCode(userId); // optional but clean
+  await userRepo.clearVerificationCode(userId); 
 }

@@ -116,7 +116,7 @@ export async function updateUserByUserId(userId: number, data: any) {
   
   const setClauses: string[] = [];
   
-  // Dynamically build UPDATE query based on provided fields
+  
   if (data.isSuspended !== undefined) {
     request.input('isSuspended', sql.Bit, data.isSuspended);
     setClauses.push('isSuspended = @isSuspended');

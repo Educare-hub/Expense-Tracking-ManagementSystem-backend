@@ -10,7 +10,7 @@ export async function createExpense(pool: sql.ConnectionPool, payload: {
   receipt_url?: string;
   is_recurring?: boolean;
   recurring_interval?: string | null;
-  expense_date: string; // YYYY-MM-DD
+  expense_date: string; 
 }) {
   const res = await pool.request()
     .input('user_id', sql.Int, payload.user_id)

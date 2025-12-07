@@ -4,8 +4,8 @@ import {
   register, 
   login, 
   verifyCode,
-  forgotPassword,      // ← ADD THIS
-  resetPassword        // ← ADD THIS
+  forgotPassword,      
+  resetPassword        
 } from '../controllers/authController';
 
 const router = Router();
@@ -13,7 +13,7 @@ const router = Router();
 router.post('/register', register);
 router.post('/login', login);
 router.post('/verify-code', verifyCode);
-router.post('/forgot-password', forgotPassword);     // ← NEW
-router.post('/reset-password', resetPassword);       // ← NEW
+router.post('/forgot-password', forgotPassword);     
+router.post('/reset-password', resetPassword);       
 
 export default router;

@@ -121,7 +121,7 @@ export async function verifyCode(req: Request, res: Response) {
   }
 }
 
-// FIXED — THIS IS THE ONLY FUNCTION THAT CHANGED
+
 export async function forgotPassword(req: Request, res: Response) {
   try {
     const { email } = req.body;
@@ -132,7 +132,7 @@ export async function forgotPassword(req: Request, res: Response) {
 
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Always generate and send code — never leak if user exists
+    // Always generate and send code and no leak if user exists
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
     await userRepo.saveVerificationCode(normalizedEmail, resetCode);
     await sendVerificationEmail(normalizedEmail, resetCode);
@@ -184,9 +184,7 @@ export async function resetPassword(req: Request, res: Response) {
   }
 }
 
-// ===================================================================
-// ADMIN FUNCTIONS - UNCHANGED (kept exactly as you had them)
-// ===================================================================
+
 
 export async function adminSuspendUser(req: AuthRequest, res: Response) {
   try {

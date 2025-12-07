@@ -1,5 +1,5 @@
 ﻿
--- EXPENSE TRACKER DATABASE SETUP (CLEAN VERSION)
+-- EXPENSE TRACKER DATABASE SETUP SCRIPT FOR MSSQL
 
 
 CREATE TABLE Users (
@@ -44,7 +44,7 @@ BEGIN
     ALTER TABLE Users ADD code_expires_at DATETIME2 NULL;
 END
 
--- THIS WILL WORK 100% — NO ERROR EVEN IF COLUMNS EXIST
+
 IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Users') AND name = 'verification_code')
     ALTER TABLE Users ADD verification_code VARCHAR(6) NULL;
 
@@ -55,7 +55,7 @@ IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Users') AN
     ALTER TABLE Users ADD verified BIT DEFAULT 0;
 
 
-    -- THIS WILL ADD THE COLUMN NO MATTER WHAT
+    -- Adding a column with error handling
 BEGIN TRY
     ALTER TABLE Users ADD code_expires_at DATETIME2 NULL;
     PRINT 'Column added successfully';
@@ -136,7 +136,7 @@ VALUES
 
 
 
--- Run these one by one — they won't fail if column already exists
+-- Run these to fix column errors such as missing column and to check if column already exists
 BEGIN TRY ALTER TABLE Users ADD verification_code VARCHAR(6) NULL; END TRY BEGIN CATCH END CATCH
 BEGIN TRY ALTER TABLE Users ADD code_expires_at DATETIME2 NULL; END TRY BEGIN CATCH END CATCH
 BEGIN TRY ALTER TABLE Users ADD verified BIT NULL; END TRY BEGIN CATCH END CATCH

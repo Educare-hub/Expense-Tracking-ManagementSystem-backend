@@ -3,6 +3,7 @@ import app from '../../src/app';
 import * as userRepo from '../../src/repositories/userRepository';
 import { hashPassword } from '../../src/services/authService';
 
+
 jest.mock('../../src/repositories/userRepository');
 
 describe('Auth Integration Tests (Updated for Verification Flow)', () => {
@@ -10,7 +11,7 @@ describe('Auth Integration Tests (Updated for Verification Flow)', () => {
   const testUser = {
     id: 1,
     username: 'testuser',
-    email: 'test@example.com',
+    email: 'test@pvexample.com',
     password_hash: '',
     role: 'user',
     created_at: new Date(),
@@ -32,15 +33,15 @@ describe('Auth Integration Tests (Updated for Verification Flow)', () => {
       .mockResolvedValueOnce(testUser);     // after creation
 
     (userRepo.createUser as jest.Mock).mockResolvedValue(1);
-    (userRepo.setVerificationCode as jest.Mock).mockResolvedValue(undefined);
+    (userRepo.saveVerificationCode as jest.Mock).mockResolvedValue(undefined);
 
     const newUser = {
-      first_name: "Test",
-      last_name: "User",
-      email: "test@example.com",
-      phone_number: "0700007778",
-      password: "123456",
-      confirmPassword: "123456"
+      first_name: "John",
+      last_name: "Gukundi",
+      email: "marywanjiku60@yahoo.com",
+      phone_number: "0700900000",
+      password: "189456",
+      confirmPassword: "189456"
     };
 
     const res = await request(app).post('/api/auth/register').send(newUser);
@@ -48,14 +49,14 @@ describe('Auth Integration Tests (Updated for Verification Flow)', () => {
     expect(res.status).toBe(201);
     expect(res.body.email).toBe("test@example.com");
     expect(res.body.message).toContain("Please verify your account.");
-    expect(userRepo.setVerificationCode).toHaveBeenCalled();
+    expect(userRepo.saveVerificationCode).toHaveBeenCalled();
   });
 
 
   test('should login successfully and send verification code', async () => {
 
     (userRepo.getUserByEmail as jest.Mock).mockResolvedValue(testUser);
-    (userRepo.setVerificationCode as jest.Mock).mockResolvedValue(undefined);
+    (userRepo.saveVerificationCode as jest.Mock).mockResolvedValue(undefined);
 
     const res = await request(app)
       .post('/api/auth/login')
@@ -82,7 +83,7 @@ describe('Auth Integration Tests (Updated for Verification Flow)', () => {
  
   test('should verify user and return token + user', async () => {
 
-    (userRepo.verifyUser as jest.Mock).mockResolvedValue(testUser);
+    (userRepo.verifyAndActivateUser as jest.Mock).mockResolvedValue(testUser);
 
     const res = await request(app)
       .post('/api/auth/verify')

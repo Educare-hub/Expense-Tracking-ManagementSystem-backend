@@ -9,13 +9,13 @@ const router = Router();
 router.use(requireAuth);
 router.use(requireAdmin);
 
-// ADMIN DASHBOARD DATA — REAL FROM MYSQL
-router.get('/users', authCtrl.getAllUsers);        // ← Returns all users
-router.get('/expenses', authCtrl.getAllExpenses);  // ← Returns all expenses
+// Admin Data Management
+router.get('/users', authCtrl.getAllUsers);        // Returns all users from the system (mssql)
+router.get('/expenses', authCtrl.getAllExpenses);  // Returns all expenses
 
 // Admin Actions
 router.post('/suspend-user', authCtrl.adminSuspendUser);
 router.delete('/expenses/:id', authCtrl.adminDeleteExpense);
-// ... other admin routes you have
+
 
 export default router;

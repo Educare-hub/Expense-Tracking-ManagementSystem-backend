@@ -1,13 +1,13 @@
-// src/routes/index.ts  ← FINAL WORKING VERSION
+// src/routes/index.ts  
 import { Router } from 'express';
 
-// CHANGE THIS LINE — THIS IS THE FIX
+
 import {
   register,
   login,
   verifyCode,
-  forgotPassword,    // ← NOW EXPLICITLY IMPORTED
-  resetPassword      // ← NOW EXPLICITLY IMPORTED
+  forgotPassword,    
+  resetPassword      
 } from '../controllers/authController';
 
 import * as catCtrl from '../controllers/categoryController';
@@ -18,12 +18,12 @@ import adminRoutes from "./adminRoutes";
 
 const router = Router();
 
-// PUBLIC AUTH ROUTES — NOW WORK 100%
+// PUBLIC AUTH ROUTES 
 router.post('/auth/register', register);
 router.post('/auth/login', login);
 router.post('/auth/verify-code', verifyCode);
-router.post('/auth/forgot-password', forgotPassword);     // ← NOW WORKS
-router.post('/auth/reset-password', resetPassword);       // ← NOW WORKS
+router.post('/auth/forgot-password', forgotPassword);     
+router.post('/auth/reset-password', resetPassword);       
 
 
 
@@ -46,6 +46,6 @@ router.delete('/expenses/:id', requireAuth, expCtrl.deleteExpense);
 
 // ADMIN ROUTES (Protected by requireAuth + requireAdmin)
 
-router.use('/admin', adminRoutes); // ← ADDED THIS
+router.use('/admin', adminRoutes); 
 
 export default router;

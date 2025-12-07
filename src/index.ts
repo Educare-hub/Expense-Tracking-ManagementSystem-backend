@@ -1,4 +1,4 @@
-// src/index.ts  ← THIS IS THE FILE THAT ACTUALLY RUNS
+// src/index.ts  
 import app from './app';
 import dotenv from 'dotenv';
 
