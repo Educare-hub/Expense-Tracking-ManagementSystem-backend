@@ -40,6 +40,13 @@ export async function saveVerificationCode(email: string, code: string) {
   
   console.log(`Verification code saved for ${email}: ${code}`);
 }
+export async function getVerificationCodeByEmail(email: string) {
+  const pool = await getDbPool();
+  const result = await pool.request()
+    .input('email', sql.VarChar(255), email)
+    .query('SELECT verification_code FROM Users WHERE email = @email');
+  return result.recordset[0];
+}
 
 export async function verifyAndActivateUser(code: string) {
   const pool = await getDbPool();

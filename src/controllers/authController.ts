@@ -8,35 +8,95 @@ import bcrypt from 'bcryptjs';
 import { getDbPool } from '../utils/db';
 import sql from 'mssql';
 
+// Validation helpers
+const validateInput = {
+  email: (email: string) => {
+    if (!email) throw { status: 400, message: 'Email is required' };
+    if (email.length > 255) throw { status: 413, message: 'Email exceeds 255 characters' };
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) throw { status: 400, message: 'Invalid email format' };
+    
+    return email.toLowerCase().trim();
+  },
+  
+  password: (password: string) => {
+    if (!password) throw { status: 400, message: 'Password is required' };
+    if (password.length < 6) throw { status: 400, message: 'Password must be at least 6 characters' };
+    if (password.length > 255) throw { status: 413, message: 'Password exceeds 255 characters' };
+    
+    return password;
+  },
+  
+  username: (username: string) => {
+    if (!username) throw { status: 400, message: 'Username is required' };
+    if (username.length > 100) throw { status: 413, message: 'Username exceeds 100 characters' };
+    if (username.trim().length === 0) throw { status: 400, message: 'Username cannot be empty' };
+    
+    return username.trim();
+  },
+  
+  verificationCode: (code: string) => {
+    if (!code) throw { status: 400, message: 'Verification code is required' };
+    if (!/^\d{6}$/.test(code.trim())) throw { status: 400, message: 'Code must be exactly 6 digits' };
+    
+    return code.trim();
+  }
+};
+
 export async function register(req: Request, res: Response) {
   try {
     const { first_name, last_name, email, password, username } = req.body;
-    if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
-
+    
+    // Validate inputs
+    const validEmail = validateInput.email(email);
+    const validPassword = validateInput.password(password);
+    
     const finalUsername = username?.trim() ||
-      (first_name && last_name ? `${first_name} ${last_name}`.trim() : email.split('@')[0]);
+      (first_name && last_name ? `${first_name} ${last_name}`.trim() : validEmail.split('@')[0]);
+    
+    const validUsername = validateInput.username(finalUsername);
+
+    // Check if user exists BEFORE attempting registration
+    const existingUser = await userRepo.getUserByEmail(validEmail);
+    if (existingUser) {
+      return res.status(409).json({ 
+        error: 'Email already registered. Please login instead.' 
+      });
+    }
 
     await authService.register({
-      username: finalUsername,
-      email: email.toLowerCase().trim(),
-      password_hash: password
+      username: validUsername,
+      email: validEmail,
+      password_hash: validPassword
     });
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-    await userRepo.saveVerificationCode(email.toLowerCase().trim(), code);
-    await sendVerificationEmail(email.toLowerCase().trim(), code);
+    await userRepo.saveVerificationCode(validEmail, code);
+    await sendVerificationEmail(validEmail, code);
 
-    console.log(`VERIFICATION CODE → ${email}: ${code}`);
+    console.log(`VERIFICATION CODE → ${validEmail}: ${code}`);
 
-    return res.json({
+    return res.status(201).json({
       success: true,
       message: 'Check your email for verification code',
-      email: email.toLowerCase().trim()
+      email: validEmail
     });
 
   } catch (err: any) {
     console.error('REGISTER ERROR:', err);
-    return res.status(400).json({ error: 'Email already exists or registration failed' });
+    
+    // Handle validation errors
+    if (err.status) {
+      return res.status(err.status).json({ error: err.message });
+    }
+    
+    // Handle database errors
+    if (err.message?.includes('duplicate') || err.message?.includes('UNIQUE')) {
+      return res.status(409).json({ error: 'Email already registered. Please login instead.' });
+    }
+    
+    return res.status(500).json({ error: 'Registration failed. Please try again.' });
   }
 }
 
@@ -44,13 +104,13 @@ export async function login(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
     
-    console.log('LOGIN ATTEMPT:', email);
+    // Validate inputs
+    const validEmail = validateInput.email(email);
+    const validPassword = validateInput.password(password);
     
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password required' });
-    }
-
-    const user = await userRepo.getUserByEmail(email.toLowerCase().trim());
+    console.log('LOGIN ATTEMPT:', validEmail);
+    
+    const user = await userRepo.getUserByEmail(validEmail);
     console.log('USER FOUND:', user ? 'YES' : 'NO');
 
     if (!user) {
@@ -58,7 +118,7 @@ export async function login(req: Request, res: Response) {
     }
 
     console.log('COMPARING PASSWORD...');
-    const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    const isValidPassword = await bcrypt.compare(validPassword, user.password_hash);
     console.log('PASSWORD VALID:', isValidPassword);
 
     if (!isValidPassword) {
@@ -85,28 +145,42 @@ export async function login(req: Request, res: Response) {
 
     console.log('USER NOT VERIFIED, SENDING CODE');
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-    await userRepo.saveVerificationCode(email.toLowerCase().trim(), code);
-    await sendVerificationEmail(email.toLowerCase().trim(), code);
-    console.log(`LOGIN CODE → ${email}: ${code}`);
+    await userRepo.saveVerificationCode(validEmail, code);
+    await sendVerificationEmail(validEmail, code);
+    console.log(`LOGIN CODE → ${validEmail}: ${code}`);
 
     return res.json({ 
       requiresVerification: true, 
-      message: 'Check your email', 
-      email: email.toLowerCase().trim() 
+      message: 'Check your email for verification code', 
+      email: validEmail 
     });
 
-  } catch (err) {
+  } catch (err: any) {
     console.error("LOGIN ERROR:", err);
-    return res.status(500).json({ error: 'Server error' });
+    
+    // Handle validation errors
+    if (err.status) {
+      return res.status(err.status).json({ error: err.message });
+    }
+    
+    return res.status(500).json({ error: 'Server error. Please try again later.' });
   }
 }
 
 export async function verifyCode(req: Request, res: Response) {
   try {
     const { code } = req.body;
-    const user = await userRepo.verifyAndActivateUser(code.trim());
+    
+    // Validate code
+    const validCode = validateInput.verificationCode(code);
+    
+    const user = await userRepo.verifyAndActivateUser(validCode);
 
-    if (!user) return res.status(400).json({ message: 'Invalid or expired code' });
+    if (!user) {
+      return res.status(400).json({ 
+        error: 'Invalid or expired verification code'
+      });
+    }
 
     const token = authService.createToken(user.id, user.role || 'User');
 
@@ -116,11 +190,17 @@ export async function verifyCode(req: Request, res: Response) {
       user: { id: user.id, username: user.username, email: user.email, role: user.role },
     });
 
-  } catch (err) {
-    return res.status(500).json({ message: 'Server error' });
+  } catch (err: any) {
+    console.error('VERIFY CODE ERROR:', err);
+    
+    // Handle validation errors
+    if (err.status) {
+      return res.status(err.status).json({ error: err.message });
+    }
+    
+    return res.status(500).json({ error: 'Server error. Please try again.' });
   }
 }
-
 
 export async function forgotPassword(req: Request, res: Response) {
   try {
@@ -183,8 +263,6 @@ export async function resetPassword(req: Request, res: Response) {
     res.status(500).json({ message: "Server error" });
   }
 }
-
-
 
 export async function adminSuspendUser(req: AuthRequest, res: Response) {
   try {

@@ -7,8 +7,8 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: process.env.EMAIL_USER,   // e.g. mwasjoh5479@gmail.com
-    pass: process.env.EMAIL_PASS    // 16-digit App Password (with spaces!)
+    user: process.env.EMAIL_USER,   
+    pass: process.env.EMAIL_PASS    
   },
   tls: {
     rejectUnauthorized: false
@@ -42,7 +42,7 @@ export async function sendVerificationEmail(email: string, code: string) {
           </p>
         </div>
       `,
-      // THIS ONE LINE FIXES GMAIL BLOCKING / SPAM / DISAPPEARING EMAILS
+      // fixing gmail from blocking me emails or returning the to spam or dissapearing them
       list: {
         unsubscribe: 'https://expensepro.com/unsubscribe'
       }

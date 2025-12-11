@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const {
-  DB_TYPE, // "mssql" or "mysql"
+  DB_TYPE, 
   DB_SERVER,
   DB_USER,
   DB_PASS,
@@ -27,7 +27,7 @@ export const getDbPool = async () => {
         throw new Error("MSSQL env vars are required: DB_SERVER, DB_USER, DB_PASS, DB_NAME");
       }
 
-      // Use dynamic import and ensure .default fallback
+      // dynamic import and ensureing default fallback
       const sqlModule = await import("mssql");
       const sql = sqlModule?.default || sqlModule; 
 

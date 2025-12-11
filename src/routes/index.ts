@@ -18,15 +18,12 @@ import adminRoutes from "./adminRoutes";
 
 const router = Router();
 
-// PUBLIC AUTH ROUTES 
+// Authentication Routes. 
 router.post('/auth/register', register);
 router.post('/auth/login', login);
 router.post('/auth/verify-code', verifyCode);
 router.post('/auth/forgot-password', forgotPassword);     
 router.post('/auth/reset-password', resetPassword);       
-
-
-
 // Expense routes
 router.use("/expenses", expenseRoutes);
 

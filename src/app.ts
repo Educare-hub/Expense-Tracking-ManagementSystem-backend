@@ -2,11 +2,12 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import routes from './routes';                    // Normal user routes: /api/auth, /api/expenses, etc.
-import adminRoutes from './routes/adminRoutes';    // Admin routes: /admin/users, /admin/expenses
-
+import routes from './routes';
+import adminRoutes from './routes/adminRoutes';
 import dotenv from 'dotenv';
 import { getDbPool } from './utils/db';
+import authRoutes from './routes/authRoutes';
+
 
 dotenv.config();
 
@@ -18,10 +19,10 @@ app.use(cors({
 }));
 app.use(bodyParser.json({ limit: '5mb' }));
 
-// USER API used by normal users (UserDashboard) /api/expenses, /api/auth
+// USER API 
 app.use('/api', routes);
 
-// ADMIN API used by AdminDashboard /admin/users, /admin/expenses
+// ADMIN API 
 app.use('/admin', adminRoutes);   
 
 app.get('/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));

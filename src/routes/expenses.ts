@@ -1,3 +1,5 @@
+// src/routes/expenses
+
 import express from "express";
 import auth from "../middleware/authMiddleware";
 import * as controller from "../controllers/expenseController";

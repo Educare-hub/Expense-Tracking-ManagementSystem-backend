@@ -2,12 +2,12 @@ import * as categoryService from '../../src/services/categoryService';
 import * as catRepo from '../../src/repositories/categoryRepository';
 import { getDbPool } from '../../src/utils/db';
 
-// 1Mock the database pool
+
 jest.mock('../../src/utils/db', () => ({
   getDbPool: jest.fn(),
 }));
 
-// 2Mock the repository functions
+
 jest.mock('../../src/repositories/categoryRepository');
 
 describe('Category Service Unit Tests', () => {
